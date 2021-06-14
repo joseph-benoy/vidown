@@ -7,7 +7,7 @@ const yt = {
             const videoFormats = ytdl.filterFormats(info.formats,'video');
             let qualityList = {};
             for(let i of videoFormats){
-                if(i['hasVideo']==true){
+                if(i['hasVideo']){
                     qualityList[i['bitrate']] = i['container'];
                 }
             }
@@ -23,7 +23,7 @@ const yt = {
             const videoFormats = ytdl.filterFormats(info.formats,'audioonly');
             let qualityList = {};
             for(let i of videoFormats){
-                if(i['hasVideo']==false){
+                if(!i['hasVideo']){
                     qualityList[i['bitrate']] = i['container'];
                 }
             }

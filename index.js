@@ -17,7 +17,12 @@ const fs = require('fs');
     }
 }
 download();*/
-(async ()=>{
+
+/*(async ()=>{
     console.log(await yt.getVideoQaulities("https://www.youtube.com/watch?v=s-bZD3O3P80"));
-})();
+})();*/
+
+console.log(yt.getVideoQaulities("https://www.youtube.com/watch?v=s-bZD3O3P80"));
+
+
 
