@@ -8,14 +8,9 @@ let NodeCache = require('node-cache');
 let ch = new NodeCache();
 let exec = require('child_process').exec;
 const { stderr, stdout } = require('process');
-
-
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
 app.post('/',(req,res)=>{
     let {chatId,text} = tg.parseUpdate(req.body);
     if(text=="/start"){
