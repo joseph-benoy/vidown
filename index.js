@@ -33,24 +33,22 @@ app.post('/',(req,res)=>{
             let url = JSON.parse(ch.get(chatId)).url;
             let filename = JSON.parse(ch.get(chatId)).filename;
             ch.take(chatId);
+            let caption = filename;
             filename = filename.replace(/\s/g,"");
             filename = filename.replace(/'/g,"");
             filename = filename.substring(0,20);
             let videoReadable = ytdl(url,{quality:'highestvideo'});
-            let videoWriteable = fs.createWriteStream(`${filename}io.mp4`);
+            let videoWriteable = fs.createWriteStream(`downloads/${filename}+++++.mp4`);
             let audioReadable = ytdl(url,{quality:'highestaudio'});
-            let audioWriteable = fs.createWriteStream(`${filename}.mp3`);
+            let audioWriteable = fs.createWriteStream(`downloads/${filename}+++++.mp3`);
             videoReadable.pipe(videoWriteable);
             videoWriteable.on('finish',()=>{
                 audioReadable.pipe(audioWriteable);
                 audioWriteable.on('finish',()=>{
-                    exec(`ffmpeg -i ${filename}io.mp4 -i ${filename}.mp3 -c:v copy -c:a aac ${filename}.mp4`,(error)=>{
-                        let message = {
-                            chat_id:chatId,
-                            video:`${filename}.mp4`,
-                            caption:`This is the file!`
-                        };
-                        tg.sendVideo(message);
+                    exec(`ffmpeg -i downloads/${filename}+++++.mp4 -i downloads/${filename}+++++.mp3 -c:v copy -c:a aac downloads/${filename}.mp4`,(error)=>{
+                        tg.sendVideo(chatId,caption,`downloads/${filename}.mp4`,()=>{
+                            console.log("Finshed!");
+                        });
                     });
                 });
             });
