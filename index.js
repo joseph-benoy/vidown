@@ -4,6 +4,8 @@ let express = require('express');
 let cookieParser = require('cookie-parser');
 let tg = require('./tg');
 let app = express();
+let NodeCache = require('node-cache');
+let ch = new NodeCache();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -22,9 +24,20 @@ app.post('/',(req,res)=>{
         tg.send({chat_id:chatId,text:"Downloading............",  reply_markup: JSON.stringify({
             remove_keyboard: true
         })});
+        if(ch.has(chatId)){
+            (
+                async ()=>{
+                    ytdl(ch.get(chatId))
+                    .pipe(fs.createWriteStream(filename));
+                }
+            )();
+        }
     }
     else if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
     {
+        if(!ch.has(chatId)){    
+            ch.set(chatId,text);
+        }
         let btnMarkup = {
             resize_keyboard: true,
             one_time_keyboard: true,
