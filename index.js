@@ -31,9 +31,11 @@ app.post('/',(req,res)=>{
         })});
         if(ch.has(chatId)){
             let url = JSON.parse(ch.get(chatId)).url;
-            let filename = JSON.parse(ch.get(chatId)).filename;
+            let filename = decodeURIComponent(JSON.parse(ch.get(chatId)).filename);
+            var combining = /[\u0300-\u036F]/g; 
+            filename = filename.normalize('NFKD').replace(combining, '');
             ch.take(chatId);
-            let caption = filename;
+            let caption = decodeURIComponent(filename);
             filename = filename.replace(/\s/g,"");
             filename = filename.replace(/'/g,"");
             filename = filename.substring(0,20);
@@ -65,6 +67,8 @@ app.post('/',(req,res)=>{
         if(ch.has(chatId)){
             let url = JSON.parse(ch.get(chatId)).url;
             let filename = JSON.parse(ch.get(chatId)).filename;
+            var combining = /[\u0300-\u036F]/g; 
+            filename = filename.normalize('NFKD').replace(combining, '');
             ch.take(chatId);
             let caption = filename;
             filename = filename.replace(/\s/g,"");
