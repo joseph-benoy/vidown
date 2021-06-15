@@ -1,22 +1,38 @@
 const yt = require('./yt');
 const fs = require('fs');
+let express = require('express');
+let cookieParser = require('cookie-parser');
+let tg = require('./tg');
+let app = express();
 
-/*const download = async ()=>{
-    try{
-        const options = {quality:'highestaudio'};
-        const info = await ytdl.getInfo("https://www.youtube.com/watch?v=aqz-KE-bpKQ");
-        const audioFormats = ytdl.filterFormats(info.formats,'videoandaudio');
-        for(let i of info.formats){
-            if(i['hasVideo']==false){
-                console.log(i['qualityLabel']+" : "+i['container']);
-            }
-        }
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+app.post('/',(req,res)=>{
+    let {chatId,text} = tg.parseUpdate(req.body);
+    if(text=="/start"){
+        let message = {
+            chat_id:chatId,
+            text:"Welcome to the Vidown Bot!\nSend a valid youtube video url tp download"
+        };
+        tg.send(message);
     }
-    catch(error){
-        console.log(error);
+    if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
+    {
+        let message = {
+            chat_id:chatId,
+            text:`${text}`
+        };
+        tg.send(message);
     }
-}
-download();*/
+    else{
+        let message = {
+            chat_id:chatId,
+            text:"Invalid url!"
+        };
+        tg.send(message);
+    }
 
 
 
@@ -26,3 +42,23 @@ download();*/
 
 
 
+
+
+
+
+
+
+
+
+    console.log(chatId,text);
+    res.end();
+});
+
+
+
+
+
+
+
+
+app.listen(3000);
