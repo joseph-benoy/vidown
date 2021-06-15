@@ -18,7 +18,12 @@ app.post('/',(req,res)=>{
         };
         tg.send(message);
     }
-    if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
+    else if(text=="Video HQ"){
+        tg.send({chat_id:chatId,text:"Downloading............",  reply_markup: JSON.stringify({
+            remove_keyboard: true
+        })});
+    }
+    else if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
     {
         let btnMarkup = {
             resize_keyboard: true,
@@ -33,15 +38,8 @@ app.post('/',(req,res)=>{
         tg.send(message);
     }
     else{
-        let message = {
-            chat_id:chatId,
-            text:"Invalid url!"
-        };
-        tg.send(message);
+        tg.send({chat_id:chatId,text:"Invalid input!"});
     }
-
-
-
 
 
 
