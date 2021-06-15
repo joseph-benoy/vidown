@@ -56,6 +56,30 @@ app.post('/',(req,res)=>{
             });
         }
     }
+    else if(text=="Audio HQ"){
+        tg.send({chat_id:chatId,text:"Downloading............",  reply_markup: JSON.stringify({
+            remove_keyboard: true
+        })});
+        if(ch.has(chatId)){
+            let url = JSON.parse(ch.get(chatId)).url;
+            let filename = JSON.parse(ch.get(chatId)).filename;
+            ch.take(chatId);
+            let caption = filename;
+            filename = filename.replace(/\s/g,"");
+            filename = filename.replace(/'/g,"");
+            filename = filename.substring(0,20);
+            exec(`mkdir downloads/${filename}`);
+            let audioReadable = ytdl(url,{quality:'highestaudio'});
+            let audioWriteable = fs.createWriteStream(`downloads/${filename}/${filename}.mp3`);
+            audioReadable.pipe(audioWriteable);
+            audioWriteable.on('finish',()=>{
+                tg.sendFile(chatId,caption,`downloads/${filename}/${filename}.mp3`,()=>{
+                    exec("cd downloads && rm -r *");
+                    console.log("Finshed!");
+                });
+            });
+        }
+    }
     else if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
     {
         let btnMarkup = {
