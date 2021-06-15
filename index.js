@@ -7,7 +7,7 @@ let app = express();
 let NodeCache = require('node-cache');
 let ch = new NodeCache();
 let exec = require('child_process').exec;
-const { stderr } = require('process');
+const { stderr, stdout } = require('process');
 
 
 
@@ -37,19 +37,20 @@ app.post('/',(req,res)=>{
             filename = filename.replace(/\s/g,"");
             filename = filename.replace(/'/g,"");
             filename = filename.substring(0,20);
-            exec(`mkdir downloads/${filename}`);
-            let videoReadable = ytdl(url,{quality:'highestvideo'});
-            let videoWriteable = fs.createWriteStream(`downloads/${filename}/${filename}+++++.mp4`);
-            let audioReadable = ytdl(url,{quality:'highestaudio'});
-            let audioWriteable = fs.createWriteStream(`downloads/${filename}/${filename}+++++.mp3`);
-            videoReadable.pipe(videoWriteable);
-            videoWriteable.on('finish',()=>{
-                audioReadable.pipe(audioWriteable);
-                audioWriteable.on('finish',()=>{
-                    exec(`ffmpeg -i downloads/${filename}/${filename}+++++.mp4 -i downloads/${filename}/${filename}+++++.mp3 -c:v copy -c:a aac downloads/${filename}/${filename}.mp4`,(error)=>{
-                        tg.sendVideo(chatId,caption,`downloads/${filename}/${filename}.mp4`,()=>{
-                            exec("cd downloads && rm -r *");
-                            console.log("Finshed!");
+            exec(`mkdir downloads/${filename}`,(error,stdout,stderr)=>{
+                let videoReadable = ytdl(url,{quality:'highestvideo'});
+                let videoWriteable = fs.createWriteStream(`downloads/${filename}/${filename}+++++.mp4`);
+                let audioReadable = ytdl(url,{quality:'highestaudio'});
+                let audioWriteable = fs.createWriteStream(`downloads/${filename}/${filename}+++++.mp3`);
+                videoReadable.pipe(videoWriteable);
+                videoWriteable.on('finish',()=>{
+                    audioReadable.pipe(audioWriteable);
+                    audioWriteable.on('finish',()=>{
+                        exec(`ffmpeg -i downloads/${filename}/${filename}+++++.mp4 -i downloads/${filename}/${filename}+++++.mp3 -c:v copy -c:a aac downloads/${filename}/${filename}.mp4`,(error)=>{
+                            tg.sendVideo(chatId,caption,`downloads/${filename}/${filename}.mp4`,()=>{
+                                exec("cd downloads && rm -r *");
+                                console.log("Finshed!");
+                            });
                         });
                     });
                 });
@@ -57,6 +58,7 @@ app.post('/',(req,res)=>{
         }
     }
     else if(text=="Audio HQ"){
+        console.log("@@@@@@@  AUDIO HQ @@@@@@@");
         tg.send({chat_id:chatId,text:"Downloading............",  reply_markup: JSON.stringify({
             remove_keyboard: true
         })});
@@ -68,14 +70,15 @@ app.post('/',(req,res)=>{
             filename = filename.replace(/\s/g,"");
             filename = filename.replace(/'/g,"");
             filename = filename.substring(0,20);
-            exec(`mkdir downloads/${filename}`);
-            let audioReadable = ytdl(url,{quality:'highestaudio'});
-            let audioWriteable = fs.createWriteStream(`downloads/${filename}/${filename}.mp3`);
-            audioReadable.pipe(audioWriteable);
-            audioWriteable.on('finish',()=>{
-                tg.sendFile(chatId,caption,`downloads/${filename}/${filename}.mp3`,()=>{
-                    exec("cd downloads && rm -r *");
-                    console.log("Finshed!");
+            exec(`mkdir downloads/${filename}`,(error,stdout,stderr)=>{
+                let audioReadable = ytdl(url,{quality:'highestaudio'});
+                let audioWriteable = fs.createWriteStream(`downloads/${filename}/${filename}.mp3`);
+                audioReadable.pipe(audioWriteable);
+                audioWriteable.on('finish',()=>{
+                    tg.sendFile(chatId,caption,`downloads/${filename}/${filename}.mp3`,()=>{
+                        exec("cd downloads && rm -r *");
+                        console.log("Finshed!");
+                    });
                 });
             });
         }

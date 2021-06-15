@@ -38,7 +38,7 @@ let tg = {
             console.log(value);
           });
     },
-    sendVideo:(chatId,caption,filePath,callback)=>{
+    sendFile:(chatId,caption,filePath,callback)=>{
       console.log("################# SENDING FILE ##############");
       let form = new formData();
       form.append('chat_id',chatId);
