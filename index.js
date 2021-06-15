@@ -6,6 +6,11 @@ let tg = require('./tg');
 let app = express();
 let NodeCache = require('node-cache');
 let ch = new NodeCache();
+let exec = require('child_process').exec;
+const { stderr } = require('process');
+
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -27,14 +32,28 @@ app.post('/',(req,res)=>{
         if(ch.has(chatId)){
             let url = JSON.parse(ch.get(chatId)).url;
             let filename = JSON.parse(ch.get(chatId)).filename;
+            ch.take(chatId);
             filename = filename.replace(/\s/g,"");
             filename = filename.replace(/'/g,"");
             filename = filename.substring(0,20);
-            filename = `${filename}.mp4`;
-            console.log(`@@@@@@@@@@@@@@@@ = ${filename}`);
-            ytdl(url)
-            .pipe(fs.createWriteStream(filename));
-            ch.take(chatId);
+            let videoReadable = ytdl(url,{quality:'highestvideo'});
+            let videoWriteable = fs.createWriteStream(`${filename}io.mp4`);
+            let audioReadable = ytdl(url,{quality:'highestaudio'});
+            let audioWriteable = fs.createWriteStream(`${filename}.mp3`);
+            videoReadable.pipe(videoWriteable);
+            videoWriteable.on('finish',()=>{
+                audioReadable.pipe(audioWriteable);
+                audioWriteable.on('finish',()=>{
+                    exec(`ffmpeg -i ${filename}io.mp4 -i ${filename}.mp3 -c:v copy -c:a aac ${filename}.mp4`,(error)=>{
+                        let message = {
+                            chat_id:chatId,
+                            video:`${filename}.mp4`,
+                            caption:`This is the file!`
+                        };
+                        tg.sendVideo(message);
+                    });
+                });
+            });
         }
     }
     else if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
