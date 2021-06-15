@@ -1,23 +1,11 @@
-const yt = require('./yt');
 const fs = require('fs');
-let express = require('express');
-let cookieParser = require('cookie-parser');
-let tg = require('./tg');
-let app = express();
+const ytdl = require('ytdl-core');
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+/*(async()=>{
+  console.log(await ytdl.getBasicInfo("https://www.youtube.com/watch?v=CSk9dUBH4K0"));
+})();*/
 
+ytdl.getBasicInfo("https://www.youtube.com/watch?v=CSk9dUBH4K0").then((info)=>{
+  console.log(info.videoDetails.title);
+});
 
-let message = {
-  chat_id: 764390489,
-  text: 'some text',
-  reply_markup: JSON.stringify({
-      remove_keyboard: true
-  })
-};
-
-
-
-tg.send(message);

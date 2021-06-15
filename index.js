@@ -35,9 +35,6 @@ app.post('/',(req,res)=>{
     }
     else if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
     {
-        if(!ch.has(chatId)){    
-            ch.set(chatId,text);
-        }
         let btnMarkup = {
             resize_keyboard: true,
             one_time_keyboard: true,
@@ -49,6 +46,18 @@ app.post('/',(req,res)=>{
             reply_markup:btnMarkup
         };
         tg.send(message);
+        let filename = "";
+        ytdl.getBasicInfo(text).then((info)=>{
+            filename = info.videoDetails.title;
+            filename.replace(" ","_");
+        });
+        console.log("@@@@@@@@@@@@@@"+filename);
+        if(!ch.has(chatId)){    
+            ch.set(chatId,JSON.stringify({url:text,filename:filename}));
+        }
+        else{
+            tg.send({chat_id:chatId,text:"Something went wrong!"});
+        }
     }
     else{
         tg.send({chat_id:chatId,text:"Invalid input!"});
