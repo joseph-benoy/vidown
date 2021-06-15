@@ -38,15 +38,16 @@ app.post('/',(req,res)=>{
             filename = filename.replace(/'/g,"");
             filename = filename.substring(0,20);
             let videoReadable = ytdl(url,{quality:'highestvideo'});
-            let videoWriteable = fs.createWriteStream(`downloads/${filename}+++++.mp4`);
+            let videoWriteable = fs.createWriteStream(`downloads/${filename}/${filename}+++++.mp4`);
             let audioReadable = ytdl(url,{quality:'highestaudio'});
-            let audioWriteable = fs.createWriteStream(`downloads/${filename}+++++.mp3`);
+            let audioWriteable = fs.createWriteStream(`downloads/${filename}/${filename}+++++.mp3`);
             videoReadable.pipe(videoWriteable);
             videoWriteable.on('finish',()=>{
                 audioReadable.pipe(audioWriteable);
                 audioWriteable.on('finish',()=>{
-                    exec(`ffmpeg -i downloads/${filename}+++++.mp4 -i downloads/${filename}+++++.mp3 -c:v copy -c:a aac downloads/${filename}.mp4`,(error)=>{
-                        tg.sendVideo(chatId,caption,`downloads/${filename}.mp4`,()=>{
+                    exec(`ffmpeg -i downloads/${filename}/${filename}+++++.mp4 -i downloads/${filename}/${filename}+++++.mp3 -c:v copy -c:a aac downloads/${filename}/${filename}.mp4`,(error)=>{
+                        tg.sendVideo(chatId,caption,`downloads/${filename}/${filename}.mp4`,()=>{
+                            exec("cd downloads && rm *.*");
                             console.log("Finshed!");
                         });
                     });
