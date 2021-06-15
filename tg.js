@@ -8,7 +8,11 @@ let tg = {
         };
     },
     send:(message)=>{
-        axios.post("https://api.telegram.org/bot1763190416:AAEPaw2fHzBk6w_0o5WmIt0kMSY_Ic15llE/sendMessage",message);
+        axios.post("https://api.telegram.org/bot1763190416:AAEPaw2fHzBk6w_0o5WmIt0kMSY_Ic15llE/sendMessage",message,        {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
     }
 };
 

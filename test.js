@@ -1,6 +1,23 @@
+const yt = require('./yt');
 const fs = require('fs');
-const ytdl = require('ytdl-core');
+let express = require('express');
+let cookieParser = require('cookie-parser');
+let tg = require('./tg');
+let app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 
-ytdl('https://www.youtube.com/watch?v=s-bZD3O3P80',{ quality: '136' })
-  .pipe(fs.createWriteStream('video.mp4'));
+let message = {
+  chat_id: 764390489,
+  text: 'some text',
+  reply_markup: JSON.stringify({
+      remove_keyboard: true
+  })
+};
+
+
+
+tg.send(message);
