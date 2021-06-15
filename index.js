@@ -1,4 +1,4 @@
-const yt = require('./yt');
+const ytdl = require('ytdl-core');
 const fs = require('fs');
 let express = require('express');
 let cookieParser = require('cookie-parser');
@@ -25,12 +25,16 @@ app.post('/',(req,res)=>{
             remove_keyboard: true
         })});
         if(ch.has(chatId)){
-            (
-                async ()=>{
-                    ytdl(ch.get(chatId))
-                    .pipe(fs.createWriteStream(filename));
-                }
-            )();
+            let url = JSON.parse(ch.get(chatId)).url;
+            let filename = JSON.parse(ch.get(chatId)).filename;
+            filename = filename.replace(/\s/g,"");
+            filename = filename.replace(/'/g,"");
+            filename = filename.substring(0,20);
+            filename = `${filename}.mp4`;
+            console.log(`@@@@@@@@@@@@@@@@ = ${filename}`);
+            ytdl(url)
+            .pipe(fs.createWriteStream(filename));
+            ch.take(chatId);
         }
     }
     else if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
@@ -49,15 +53,14 @@ app.post('/',(req,res)=>{
         let filename = "";
         ytdl.getBasicInfo(text).then((info)=>{
             filename = info.videoDetails.title;
-            filename.replace(" ","_");
+            console.log(filename);
+            if(!ch.has(chatId)){    
+                ch.set(chatId,JSON.stringify({url:text,filename:filename}));
+            }
+            else{
+                tg.send({chat_id:chatId,text:"Something went wrong!"});
+            }
         });
-        console.log("@@@@@@@@@@@@@@"+filename);
-        if(!ch.has(chatId)){    
-            ch.set(chatId,JSON.stringify({url:text,filename:filename}));
-        }
-        else{
-            tg.send({chat_id:chatId,text:"Something went wrong!"});
-        }
     }
     else{
         tg.send({chat_id:chatId,text:"Invalid input!"});
