@@ -37,6 +37,7 @@ app.post('/',(req,res)=>{
             filename = filename.replace(/\s/g,"");
             filename = filename.replace(/'/g,"");
             filename = filename.substring(0,20);
+            exec(`mkdir downloads/${filename}`);
             let videoReadable = ytdl(url,{quality:'highestvideo'});
             let videoWriteable = fs.createWriteStream(`downloads/${filename}/${filename}+++++.mp4`);
             let audioReadable = ytdl(url,{quality:'highestaudio'});
@@ -47,7 +48,7 @@ app.post('/',(req,res)=>{
                 audioWriteable.on('finish',()=>{
                     exec(`ffmpeg -i downloads/${filename}/${filename}+++++.mp4 -i downloads/${filename}/${filename}+++++.mp3 -c:v copy -c:a aac downloads/${filename}/${filename}.mp4`,(error)=>{
                         tg.sendVideo(chatId,caption,`downloads/${filename}/${filename}.mp4`,()=>{
-                            exec("cd downloads && rm *.*");
+                            exec("cd downloads && rm -r *");
                             console.log("Finshed!");
                         });
                     });
@@ -60,7 +61,7 @@ app.post('/',(req,res)=>{
         let btnMarkup = {
             resize_keyboard: true,
             one_time_keyboard: true,
-            keyboard: [['Video HQ'],['Video LQ'],['Audio HQ'],['Audio LQ']]
+            keyboard: [['Video HQ'],['Audio HQ']]
           };
         let message = {
             chat_id:chatId,
