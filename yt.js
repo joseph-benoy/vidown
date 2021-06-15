@@ -4,11 +4,11 @@ const yt = {
     getVideoQaulities:async (url)=>{
         try{
             const info = await ytdl.getInfo(url);
-            const videoFormats = ytdl.filterFormats(info.formats,'video');
+            const videoFormats = ytdl.filterFormats(info.formats,'videoandaudio');
             let qualityList = {};
             for(let i of videoFormats){
                 if(i['hasVideo']){
-                    qualityList[i['bitrate']] = i['container'];
+                    qualityList[i['contentLength']] = i['container'];
                 }
             }
             return qualityList;
@@ -24,7 +24,7 @@ const yt = {
             let qualityList = {};
             for(let i of videoFormats){
                 if(!i['hasVideo']){
-                    qualityList[i['bitrate']] = i['container'];
+                    qualityList[i['contentLength']] = i['container'];
                 }
             }
             return qualityList;
