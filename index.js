@@ -20,11 +20,19 @@ app.post('/',(req,res)=>{
     }
     if((/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/).test(text))
     {
-        let message = {
-            chat_id:chatId,
-            text:`${text}`
-        };
-        tg.send(message);
+        var videoFormats = {};
+        var audioFormats = {};
+        yt.getVideoQaulities(text).then((info)=>{
+            videoFormats = info;
+            yt.getAudioQualities(text).then((info)=>{
+                audioFormats = info;
+            });
+            let message = {
+                chat_id:chatId,
+                text:"Choose a download option"
+            };
+            tg.send(message);
+        });
     }
     else{
         let message = {
